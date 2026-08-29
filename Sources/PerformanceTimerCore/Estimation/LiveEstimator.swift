@@ -22,6 +22,8 @@ public final class LiveEstimator {
         public var accelerometerBias: Double
         /// Longitudinal specific force from the most recent sample, m/s².
         public var longitudinalAcceleration: Double
+        /// Highest speed seen this run, m/s. A readout, like `speed` — never a result.
+        public var peakSpeed: Double
         public var isStationary: Bool
         public var hasGNSSLock: Bool
         public var calibrationValid: Bool
@@ -31,19 +33,23 @@ public final class LiveEstimator {
 
         public var speedMph: Double { speed / PTConstants.mphToMetersPerSecond }
         public var speedKmh: Double { speed / PTConstants.kmhToMetersPerSecond }
+        public var peakSpeedMph: Double { peakSpeed / PTConstants.mphToMetersPerSecond }
+        public var peakSpeedKmh: Double { peakSpeed / PTConstants.kmhToMetersPerSecond }
 
         // Swift only synthesises an *internal* memberwise initialiser for a public struct, so
         // this has to be spelled out for the app module to construct a Readout at all.
         public init(
             state: SessionState, speed: Double, distance: Double, accelerometerBias: Double,
-            longitudinalAcceleration: Double, isStationary: Bool, hasGNSSLock: Bool,
-            calibrationValid: Bool, stopReason: SessionStateMachine.StopReason?, t: Double
+            longitudinalAcceleration: Double, peakSpeed: Double = 0, isStationary: Bool,
+            hasGNSSLock: Bool, calibrationValid: Bool,
+            stopReason: SessionStateMachine.StopReason?, t: Double
         ) {
             self.state = state
             self.speed = speed
             self.distance = distance
             self.accelerometerBias = accelerometerBias
             self.longitudinalAcceleration = longitudinalAcceleration
+            self.peakSpeed = peakSpeed
             self.isStationary = isStationary
             self.hasGNSSLock = hasGNSSLock
             self.calibrationValid = calibrationValid
@@ -75,6 +81,7 @@ public final class LiveEstimator {
     private var lastSampleTime: Double?
     private var lastFixTime: Double?
     private var userRequestedStop = false
+    private var peakSpeed = 0.0
 
     /// How stale a fix may be before GNSS counts as lost, seconds.
     public var gnssLockTimeout: Double = 3.0
@@ -113,8 +120,9 @@ public final class LiveEstimator {
         lastSampleTime = nil
         lastFixTime = nil
         userRequestedStop = false
+        peakSpeed = 0
         readout = Readout(state: .idle, speed: 0, distance: 0, accelerometerBias: 0,
-                          longitudinalAcceleration: 0, isStationary: false,
+                          longitudinalAcceleration: 0, peakSpeed: 0, isStationary: false,
                           hasGNSSLock: false, calibrationValid: false, stopReason: nil, t: 0)
     }
 
@@ -195,12 +203,15 @@ public final class LiveEstimator {
             capturedEvents = preArmBuffer.drain()
         }
 
+        peakSpeed = max(peakSpeed, filter.speed)
+
         readout = Readout(
             state: machine.state,
             speed: filter.speed,
             distance: filter.distance,
             accelerometerBias: filter.accelerometerBias,
             longitudinalAcceleration: acceleration,
+            peakSpeed: peakSpeed,
             isStationary: detector.isStationary,
             hasGNSSLock: hasLock,
             calibrationValid: resolver != nil,

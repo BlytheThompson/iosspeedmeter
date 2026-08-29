@@ -486,3 +486,30 @@ final class LiveEstimatorTests: XCTestCase {
         XCTAssertEqual(estimator.readout.speed, 0)
     }
 }
+
+extension LiveEstimatorTests {
+    func testPeakSpeedRecordsTheHighestSpeedSeenAndNeverFalls() {
+        var session = SyntheticSession()
+        session.runDuration = 10
+        let estimator = LiveEstimator()
+        var previousPeak = 0.0
+        for event in session.events().sorted(by: { $0.t < $1.t }) {
+            estimator.ingest(event)
+            let peak = estimator.readout.peakSpeed
+            XCTAssertGreaterThanOrEqual(peak, previousPeak, "peak speed must be monotonic")
+            XCTAssertGreaterThanOrEqual(peak, estimator.readout.speed - 1e-9)
+            previousPeak = peak
+        }
+        XCTAssertGreaterThan(estimator.readout.peakSpeed, 20)
+    }
+
+    func testResetClearsPeakSpeed() {
+        var session = SyntheticSession()
+        session.runDuration = 6
+        let estimator = LiveEstimator()
+        for event in session.events().sorted(by: { $0.t < $1.t }) { estimator.ingest(event) }
+        XCTAssertGreaterThan(estimator.readout.peakSpeed, 0)
+        estimator.reset()
+        XCTAssertEqual(estimator.readout.peakSpeed, 0)
+    }
+}

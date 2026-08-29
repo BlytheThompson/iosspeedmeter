@@ -1,0 +1,183 @@
+<title>Layout check</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* Faithful re-creation of the SwiftUI at 1pt = 1px, to find layout faults I cannot
+     otherwise see. Inter/Roboto Mono stand in for SF Pro/SF Mono; metrics are close enough
+     that anything tight here is tight on device. */
+  :root{
+    --asphalt:#0E1113; --graphite:#2A3034; --paper:#F2EFE9; --ink:#16191B;
+    --stage:#FFB020; --go:#35D07F; --flag:#E5484D; --dim:#8A9398;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#3a3f44;font-family:Inter,sans-serif;padding:24px;display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap}
+  .device{flex:0 0 auto}
+  .cap{color:#cfd4d8;font-size:12px;margin-bottom:8px;font-weight:600}
+  .screen{overflow:hidden;border-radius:30px;position:relative}
+  .w393{width:393px;height:852px}
+  .w440{width:440px;height:956px}
+  .mono{font-family:'Roboto Mono',monospace;font-variant-numeric:tabular-nums}
+  .lbl{text-transform:uppercase;letter-spacing:1.4px;color:var(--dim);font-weight:600}
+
+  /* ---- live ---- */
+  .live{background:var(--asphalt);color:var(--paper);padding:0 20px;display:flex;flex-direction:column;height:100%}
+  .status{display:flex;justify-content:space-between;align-items:flex-start;padding-top:12px}
+  .stitle{font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:1.8px;color:var(--stage)}
+  .sub{font-size:11px;margin-top:6px}
+  .tree{background:rgba(0,0,0,.35);border:1px solid var(--graphite);border-radius:6px;padding:14px 12px;display:flex;flex-direction:column;gap:10px}
+  .bulb{width:18px;height:18px;border-radius:50%;background:var(--graphite);border:1px solid rgba(0,0,0,.4)}
+  .bulb.amber{background:var(--stage);box-shadow:0 0 8px rgba(255,176,32,.7)}
+  .bulb.green{background:var(--go);box-shadow:0 0 8px rgba(53,208,127,.7);margin-top:4px}
+  .bulb.off{margin-top:0}
+  .bulb.greenoff{margin-top:4px}
+  .spacer{flex:1}
+  .speed{text-align:center}
+  .speedn{font-size:92px;font-weight:600;line-height:1}
+  .speedu{font-size:13px;margin-top:-6px}
+  .peak{margin-top:14px;color:var(--dim)}
+  .dist{padding-bottom:18px}
+  .bar{height:4px;background:var(--graphite);margin-bottom:8px}
+  .barfill{height:4px;background:var(--go)}
+  .distrow{display:flex;justify-content:space-between;align-items:center}
+  .telem{display:flex;gap:18px;padding:14px 0;border-top:1px solid var(--graphite)}
+  .tcell{flex:1}
+  .tname{font-size:9px;text-transform:uppercase;letter-spacing:1.4px;color:var(--dim);font-weight:600}
+  .tval{font-size:13px;margin-top:3px}
+  .btn{width:100%;padding:15px 0;border-radius:4px;text-align:center;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1.4px;color:var(--paper);margin-bottom:20px}
+
+  /* ---- timeslip ---- */
+  .slip{background:var(--paper);color:var(--ink);padding:22px;height:100%;overflow-y:auto}
+  .mast{font-size:26px;font-weight:900;text-transform:uppercase;letter-spacing:4px}
+  .chips{display:flex;gap:8px;margin-top:4px}
+  .chip{font-size:10px;text-transform:uppercase;letter-spacing:1.4px;padding:3px 7px;font-weight:600}
+  .sec{padding-bottom:24px}
+  .sech{font-size:10px;text-transform:uppercase;letter-spacing:1.4px;color:rgba(22,25,27,.5);font-weight:600;padding-bottom:8px}
+  .row{display:flex;justify-content:space-between;align-items:baseline;padding:6px 0}
+  .rname{font-size:14px;font-weight:600}
+  .val{display:flex;align-items:baseline;gap:6px}
+  .v1{font-size:24px;font-weight:600}
+  .v2{font-size:15px;font-weight:500;color:rgba(22,25,27,.65)}
+  .v3{font-size:11px;text-transform:uppercase;letter-spacing:1.4px;color:rgba(22,25,27,.5);font-weight:600}
+  .hr{border-bottom:1px solid rgba(22,25,27,.12)}
+  .dhead{display:flex;padding-bottom:2px}
+  .dhead span{font-size:9px;text-transform:uppercase;letter-spacing:1.4px;color:var(--dim);font-weight:600;text-align:right}
+  .drow{display:flex;padding:5px 0;align-items:baseline}
+  .dname{flex:1;font-size:14px;font-weight:600}
+  .c96{width:96px;text-align:right;font-size:15px}
+  .c96b{width:96px;text-align:right;font-size:15px;font-weight:600}
+  .c74{width:74px;text-align:right;font-size:13px}
+  .drow2{padding:7px 0}
+  .d-top{display:flex;justify-content:space-between;align-items:baseline}
+  .d-sub{text-align:right;font-size:11px;color:rgba(22,25,27,.55);margin-top:2px}
+  .note{font-size:11px;color:rgba(22,25,27,.55);padding-top:6px}
+</style>
+
+<div class="device">
+  <div class="cap">Live — 393pt (iPhone 16 Pro)</div>
+  <div class="screen w393">
+    <div class="live">
+      <div class="status">
+        <div>
+          <div class="stitle">Armed</div>
+          <div class="sub lbl">Waiting for still</div>
+        </div>
+        <div class="tree">
+          <div class="bulb amber"></div><div class="bulb amber"></div>
+          <div class="bulb off"></div><div class="bulb greenoff"></div>
+        </div>
+      </div>
+      <div class="spacer" style="flex:.62"></div>
+      <div class="speed">
+        <div class="speedn mono" style="font-size:148px">87.4</div>
+        <div class="speedu lbl">mph</div>
+        <div class="peak"><span class="lbl" style="font-size:9px">Peak</span> <span class="mono" style="font-size:15px">92.6</span></div>
+      </div>
+      <div class="spacer"></div>
+      <div class="dist">
+        <div class="bar"><div class="barfill" style="width:35%"></div></div>
+        <div class="distrow"><span class="mono" style="font-size:13px">142 m</span><span class="lbl" style="font-size:11px">402 m target</span></div>
+      </div>
+      <div class="telem">
+        <div class="tcell"><div class="tname">GNSS</div><div class="tval mono" style="color:var(--go)">lock</div></div>
+        <div class="tcell"><div class="tname">ZUPT</div><div class="tval mono" style="color:var(--dim)">off</div></div>
+        <div class="tcell"><div class="tname">Bias</div><div class="tval mono">+0.124</div></div>
+        <div class="tcell"><div class="tname">Accel</div><div class="tval mono">+4.96</div></div>
+      </div>
+      <div class="btn" style="background:var(--flag)">Stop run</div>
+    </div>
+  </div>
+</div>
+
+<div class="device">
+  <div class="cap">Timeslip — 393pt</div>
+  <div class="screen w393">
+    <div class="slip">
+      <div class="mast">Timeslip</div>
+      <div class="chips">
+        <div class="chip" style="background:rgba(53,208,127,.28)">High confidence</div>
+      </div>
+      <div style="height:18px"></div>
+
+      <div class="sec">
+        <div class="sech">From a standstill</div>
+        <div><div class="row"><span class="rname">0–30 mph</span><span class="val"><span class="v1 mono">2.700</span><span class="v2 mono">± 0.007</span><span class="v3">s</span></span></div><div class="hr"></div></div>
+        <div><div class="row"><span class="rname">0–60 mph</span><span class="val"><span class="v1 mono">5.385</span><span class="v2 mono">± 0.007</span><span class="v3">s</span></span></div><div class="hr"></div></div>
+        <div><div class="row"><span class="rname">0–100 mph</span><span class="val"><span class="v1 mono">8.963</span><span class="v2 mono">± 0.007</span><span class="v3">s</span></span></div><div class="hr"></div></div>
+        <div><div class="row"><span class="rname">0–130 mph</span><span class="val"><span class="v1 mono">11.640</span><span class="v2 mono">± 0.007</span><span class="v3">s</span></span></div><div class="hr"></div></div>
+      </div>
+
+      <div class="sec">
+        <div class="sech">Distance marks</div>
+                <div><div class="drow2">
+          <div class="d-top"><span class="rname">60 ft</span><span class="val"><span class="v1 mono">2.353</span><span class="v2 mono">± 0.004</span><span class="v3">s</span></span></div>
+          <div class="d-sub">from rest <span class="mono">2.721</span> s · trap <span class="mono">30.2</span> mph</div>
+        </div><div class="hr"></div></div>
+        <div><div class="drow2">
+          <div class="d-top"><span class="rname">330 ft</span><span class="val"><span class="v1 mono">5.992</span><span class="v2 mono">± 0.004</span><span class="v3">s</span></span></div>
+          <div class="d-sub">from rest <span class="mono">6.361</span> s · trap <span class="mono">70.9</span> mph</div>
+        </div><div class="hr"></div></div>
+        <div><div class="drow2">
+          <div class="d-top"><span class="rname">1/8 mile</span><span class="val"><span class="v1 mono">8.621</span><span class="v2 mono">± 0.003</span><span class="v3">s</span></span></div>
+          <div class="d-sub">from rest <span class="mono">8.989</span> s · trap <span class="mono">100.3</span> mph</div>
+        </div><div class="hr"></div></div>
+        <div><div class="drow2">
+          <div class="d-top"><span class="rname">1000 ft</span><span class="val"><span class="v1 mono">10.692</span><span class="v2 mono">± 0.003</span><span class="v3">s</span></span></div>
+          <div class="d-sub">from rest <span class="mono">11.061</span> s · trap <span class="mono">123.5</span> mph</div>
+        </div><div class="hr"></div></div>
+        <div><div class="drow2">
+          <div class="d-top"><span class="rname">1/4 mile</span><span class="val"><span class="v1 mono">12.336</span><span class="v2 mono">± 0.003</span><span class="v3">s</span></span></div>
+          <div class="d-sub">from rest <span class="mono">12.705</span> s · trap <span class="mono">141.9</span> mph</div>
+        </div><div class="hr"></div></div>
+        <div class="note">The large figure is the 1-foot rollout ET — what a drag strip prints and what Dragy shows.</div>
+      </div>
+
+      <div class="sec">
+        <div class="sech">Rolling starts</div>
+        <div><div class="row"><span class="rname">40–100 mph</span><span class="val"><span class="v1 mono">5.371</span><span class="v2 mono">± 0.010</span><span class="v3">s</span></span></div><div class="hr"></div></div>
+        <div><div class="row"><span class="rname">100–150 mph</span><span class="val"><span class="v1 mono">4.464</span><span class="v2 mono">± 0.011</span><span class="v3">s</span></span></div><div class="hr"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="device">
+  <div class="cap">Timeslip — 440pt (17 Pro Max)</div>
+  <div class="screen w440">
+    <div class="slip">
+      <div class="mast">Timeslip</div>
+      <div class="chips">
+        <div class="chip" style="background:rgba(53,208,127,.28)">Medium confidence</div>
+        <div class="chip" style="background:rgba(255,176,32,.28)">+2.1% grade</div>
+      </div>
+      <div style="font-size:11px;color:rgba(22,25,27,.6);margin-top:4px">· 1 GNSS fix rejected</div>
+      <div style="font-size:11px;color:rgba(22,25,27,.6)">· Mean grade 2.1%</div>
+      <div style="height:18px"></div>
+      <div class="sec">
+        <div class="sech">Distance marks</div>
+        <div><div class="drow"><span class="dname">1/4 mile</span><span class="c96 mono">12.705</span><span class="c96b mono">12.336</span><span class="c74 mono">141.9</span></div><div class="hr"></div></div>
+        <div><div class="drow"><span class="dname">1 mile</span><span class="c96 mono">104.318</span><span class="c96b mono">103.949</span><span class="c74 mono">198.7</span></div><div class="hr"></div></div>
+      </div>
+    </div>
+  </div>
+</div>

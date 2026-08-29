@@ -38,6 +38,9 @@ public struct TimeslipView: View {
                 provenance
             }
             .padding(22)
+            // Clearance for the "Run again" control overlaid by RootView — without it the
+            // button sits on top of the last section.
+            .padding(.bottom, 76)
         }
         .background(Theme.paper.ignoresSafeArea())
         .foregroundStyle(Theme.ink)
@@ -95,46 +98,54 @@ public struct TimeslipView: View {
         }
     }
 
+    /// Distance marks, one two-line row each rather than a four-column table.
+    ///
+    /// A fixed-width table fits on a 393 pt phone only by leaving the name column 83 pt and
+    /// dropping the uncertainty entirely — which would be the one number spec §9.4 insists must
+    /// never be dropped. Promoting the rollout ET with its ±, and demoting from-rest and trap to
+    /// a secondary line, keeps every figure and reads far better at a glance.
     private func distanceSection(_ results: RunResults) -> some View {
         section("Distance marks") {
-            HStack {
-                Text("").frame(maxWidth: .infinity, alignment: .leading)
-                Text("from rest").trackLabel(9).frame(width: 96, alignment: .trailing)
-                Text("1-ft rollout").trackLabel(9).frame(width: 96, alignment: .trailing)
-                Text("trap").trackLabel(9).frame(width: 74, alignment: .trailing)
-            }
-            .padding(.bottom, 2)
-
-            ForEach(results.distanceResults) { result in
-                HStack {
-                    Text(result.mark.name)
-                        .font(Theme.label(14, weight: .semibold))
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    Text(String(format: "%.3f", result.elapsedFromRest))
-                        .font(Theme.numeric(15)).monospacedDigit()
-                        .frame(width: 96, alignment: .trailing)
-                    Text(String(format: "%.3f", result.elapsedFromRollout))
-                        .font(Theme.numeric(15, weight: .semibold)).monospacedDigit()
-                        .frame(width: 96, alignment: .trailing)
-                    Text(trapText(result))
-                        .font(Theme.numeric(13)).monospacedDigit()
-                        .frame(width: 74, alignment: .trailing)
-                }
-                .padding(.vertical, 5)
-                Divider().overlay(Theme.ink.opacity(0.12))
-            }
-
-            Text("The 1-ft rollout column is what a drag strip prints and what Dragy shows.")
+            Text("The large figure is the 1-foot rollout ET — what a drag strip prints and "
+                 + "what Dragy shows.")
                 .font(Theme.label(11, weight: .regular))
                 .foregroundStyle(Theme.ink.opacity(0.55))
-                .padding(.top, 6)
+                .padding(.bottom, 6)
+
+            ForEach(results.distanceResults) { result in
+                VStack(spacing: 2) {
+                    HStack(alignment: .firstTextBaseline) {
+                        Text(result.mark.name)
+                            .font(Theme.label(14, weight: .semibold))
+                        Spacer()
+                        timeWithUncertainty(result.elapsedFromRollout, result.sigma)
+                    }
+                    HStack(spacing: 0) {
+                        Spacer()
+                        Text("from rest ")
+                        Text(String(format: "%.3f", result.elapsedFromRest)).monospacedDigit()
+                        Text(" s · trap ")
+                        Text(trapText(result)).monospacedDigit()
+                        Text(useMetricUnits ? " km/h" : " mph")
+                    }
+                    .font(Theme.label(11, weight: .regular))
+                    .foregroundStyle(Theme.ink.opacity(0.55))
+                }
+                .padding(.vertical, 7)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(result.mark.name)
+                .accessibilityValue(String(
+                    format: "%.3f seconds with rollout, plus or minus %.3f. From rest %.3f "
+                        + "seconds. Trap speed %.1f.",
+                    result.elapsedFromRollout, result.sigma, result.elapsedFromRest,
+                    useMetricUnits ? result.trapSpeedKmh : result.trapSpeedMph))
+                Divider().overlay(Theme.ink.opacity(0.12))
+            }
         }
     }
 
     private func trapText(_ result: DistanceResult) -> String {
-        useMetricUnits
-            ? String(format: "%.1f", result.trapSpeedKmh)
-            : String(format: "%.1f", result.trapSpeedMph)
+        String(format: "%.1f", useMetricUnits ? result.trapSpeedKmh : result.trapSpeedMph)
     }
 
     private func rollSection(_ results: RunResults) -> some View {

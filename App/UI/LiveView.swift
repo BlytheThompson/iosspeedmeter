@@ -115,18 +115,40 @@ public struct LiveView: View {
 
     // MARK: Speed
 
+    private var peakText: String {
+        let value = controller.settings.useMetricUnits
+            ? readout.peakSpeedKmh : readout.peakSpeedMph
+        return String(format: "%.1f", max(0, value))
+    }
+
+    /// The speed readout is the one thing that has to be legible at arm's length through a
+    /// windscreen, so it is sized to actually occupy the space rather than float in it. The
+    /// bottom padding shifts it above the true centre: optically centred text sits high, and
+    /// it leaves the lower half to the progress and telemetry cluster.
     private var speedBlock: some View {
         VStack(spacing: -6) {
             Text(speedText)
-                .font(Theme.numeric(92, weight: .semibold))
+                .font(Theme.numeric(148, weight: .semibold))
                 .monospacedDigit()
-                .minimumScaleFactor(0.5)
+                .minimumScaleFactor(0.4)
                 .lineLimit(1)
             Text(speedUnit).trackLabel(13)
+
+            if readout.peakSpeed > 0.5 {
+                HStack(spacing: 6) {
+                    Text("Peak").trackLabel(9)
+                    Text(peakText)
+                        .font(Theme.numeric(15))
+                        .monospacedDigit()
+                        .foregroundStyle(Theme.dim)
+                }
+                .padding(.top, 14)
+            }
         }
+        .padding(.bottom, 70)
         .accessibilityElement(children: .combine)
         .accessibilityLabel("Speed")
-        .accessibilityValue("\(speedText) \(speedUnit)")
+        .accessibilityValue("\(speedText) \(speedUnit), peak \(peakText)")
     }
 
     // MARK: Distance
