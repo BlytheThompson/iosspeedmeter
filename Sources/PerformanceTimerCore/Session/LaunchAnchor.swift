@@ -44,6 +44,11 @@ public enum LaunchAnchor {
     public struct Anchor: Equatable, Sendable {
         public var index: Int
         public var time: Double
+
+        public init(index: Int, time: Double) {
+            self.index = index
+            self.time = time
+        }
     }
 
     /// Spec §8: `v_smoothed < 0.02 m/s`.

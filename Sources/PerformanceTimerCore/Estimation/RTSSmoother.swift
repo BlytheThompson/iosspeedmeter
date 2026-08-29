@@ -14,6 +14,18 @@ public struct SmoothedSample: Sendable {
     /// carried through instead (spec §6.4's determinant guard).
     public var carriedForwardDueToSingularCovariance: Bool
 
+    public init(
+        t: Double, dt: Double, acceleration: Double, state: Matrix, covariance: Matrix,
+        carriedForwardDueToSingularCovariance: Bool
+    ) {
+        self.t = t
+        self.dt = dt
+        self.acceleration = acceleration
+        self.state = state
+        self.covariance = covariance
+        self.carriedForwardDueToSingularCovariance = carriedForwardDueToSingularCovariance
+    }
+
     public var distance: Double { state[StateIndex.distance, 0] }
     public var speed: Double { state[StateIndex.speed, 0] }
     public var accelerometerBias: Double { state[StateIndex.bias, 0] }

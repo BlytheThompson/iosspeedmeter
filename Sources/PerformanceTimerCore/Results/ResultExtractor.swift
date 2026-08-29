@@ -13,6 +13,17 @@ public struct DistanceResult: Equatable, Sendable, Identifiable {
     /// 1σ on the elapsed time, seconds (spec §9.4).
     public var sigma: Double
 
+    public init(
+        mark: DistanceMark, elapsedFromRest: Double, elapsedFromRollout: Double,
+        trapSpeed: Double, sigma: Double
+    ) {
+        self.mark = mark
+        self.elapsedFromRest = elapsedFromRest
+        self.elapsedFromRollout = elapsedFromRollout
+        self.trapSpeed = trapSpeed
+        self.sigma = sigma
+    }
+
     public var id: String { mark.id }
     public var trapSpeedMph: Double { trapSpeed / PTConstants.mphToMetersPerSecond }
     public var trapSpeedKmh: Double { trapSpeed / PTConstants.kmhToMetersPerSecond }
@@ -28,6 +39,13 @@ public struct SpeedResult: Equatable, Sendable, Identifiable {
     /// 1σ on the elapsed time, seconds.
     public var sigma: Double
 
+    public init(mark: SpeedMark, elapsed: Double, distance: Double, sigma: Double) {
+        self.mark = mark
+        self.elapsed = elapsed
+        self.distance = distance
+        self.sigma = sigma
+    }
+
     public var id: String { mark.id }
 }
 
@@ -37,6 +55,13 @@ public struct RollResult: Equatable, Sendable, Identifiable {
     public var elapsed: Double
     public var distance: Double
     public var sigma: Double
+
+    public init(window: RollWindow, elapsed: Double, distance: Double, sigma: Double) {
+        self.window = window
+        self.elapsed = elapsed
+        self.distance = distance
+        self.sigma = sigma
+    }
 
     public var id: String { window.id }
 }
@@ -49,6 +74,17 @@ public struct RunResults: Equatable, Sendable {
     public var distanceResults: [DistanceResult]
     public var speedResults: [SpeedResult]
     public var rollResults: [RollResult]
+
+    public init(
+        anchorTime: Double, rolloutTime: Double?, distanceResults: [DistanceResult],
+        speedResults: [SpeedResult], rollResults: [RollResult]
+    ) {
+        self.anchorTime = anchorTime
+        self.rolloutTime = rolloutTime
+        self.distanceResults = distanceResults
+        self.speedResults = speedResults
+        self.rollResults = rollResults
+    }
 
     public func distanceResult(for mark: DistanceMark) -> DistanceResult? {
         distanceResults.first { $0.mark == mark }

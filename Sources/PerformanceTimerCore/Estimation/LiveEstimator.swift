@@ -31,6 +31,25 @@ public final class LiveEstimator {
 
         public var speedMph: Double { speed / PTConstants.mphToMetersPerSecond }
         public var speedKmh: Double { speed / PTConstants.kmhToMetersPerSecond }
+
+        // Swift only synthesises an *internal* memberwise initialiser for a public struct, so
+        // this has to be spelled out for the app module to construct a Readout at all.
+        public init(
+            state: SessionState, speed: Double, distance: Double, accelerometerBias: Double,
+            longitudinalAcceleration: Double, isStationary: Bool, hasGNSSLock: Bool,
+            calibrationValid: Bool, stopReason: SessionStateMachine.StopReason?, t: Double
+        ) {
+            self.state = state
+            self.speed = speed
+            self.distance = distance
+            self.accelerometerBias = accelerometerBias
+            self.longitudinalAcceleration = longitudinalAcceleration
+            self.isStationary = isStationary
+            self.hasGNSSLock = hasGNSSLock
+            self.calibrationValid = calibrationValid
+            self.stopReason = stopReason
+            self.t = t
+        }
     }
 
     public private(set) var readout = Readout(

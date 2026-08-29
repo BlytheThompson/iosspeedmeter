@@ -40,6 +40,24 @@ public struct SessionAnalysis: Sendable {
     public var confidence: ConfidenceAssessment
     public var diagnostics: SessionDiagnostics
     public var vehicleCalibration: VehicleFrameCalibration?
+
+    public init(
+        steps: [FilterStep], smoothed: [SmoothedSample], stationaryFlags: [Bool],
+        anchor: LaunchAnchor.Anchor?, results: RunResults?, grade: GradeEstimate?,
+        gradeCorrectedResults: RunResults?, confidence: ConfidenceAssessment,
+        diagnostics: SessionDiagnostics, vehicleCalibration: VehicleFrameCalibration?
+    ) {
+        self.steps = steps
+        self.smoothed = smoothed
+        self.stationaryFlags = stationaryFlags
+        self.anchor = anchor
+        self.results = results
+        self.grade = grade
+        self.gradeCorrectedResults = gradeCorrectedResults
+        self.confidence = confidence
+        self.diagnostics = diagnostics
+        self.vehicleCalibration = vehicleCalibration
+    }
 }
 
 /// Spec §15 — the whole estimation pipeline, from a recorded event stream to a timeslip.

@@ -23,6 +23,18 @@ public struct GradeEstimate: Equatable, Sendable {
     /// at cabin pressure — HVAC, an open window, a flexing door seal — not at real elevation.
     public var barometerDisagreesWithGNSS: Bool
 
+    public init(
+        meanGradePercent: Double, source: Source, elevationChange: Double,
+        fittedDistance: Double, fitQuality: Double, barometerDisagreesWithGNSS: Bool
+    ) {
+        self.meanGradePercent = meanGradePercent
+        self.source = source
+        self.elevationChange = elevationChange
+        self.fittedDistance = fittedDistance
+        self.fitQuality = fitQuality
+        self.barometerDisagreesWithGNSS = barometerDisagreesWithGNSS
+    }
+
     /// Spec §7.2: "A run with more than 1% mean grade should be visually flagged."
     public var exceedsReportingThreshold: Bool { abs(meanGradePercent) > 1.0 }
 

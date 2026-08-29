@@ -7,23 +7,29 @@ enum SyntheticTrace {
     static func constantAcceleration(
         _ a: Double, duration: Double, dt: Double = 0.01, speedSigma: Double = 0.02
     ) -> [SmoothedSample] {
-        stride(from: 0.0, through: duration, by: dt).map { t in
-            sample(t: t, s: 0.5 * a * t * t, v: a * t, a: a, speedSigma: speedSigma)
+        var out: [SmoothedSample] = []
+        for t in stride(from: 0.0, through: duration, by: dt) {
+            let distance: Double = 0.5 * a * t * t
+            let speed: Double = a * t
+            out.append(sample(t: t, s: distance, v: speed, a: a, speedSigma: speedSigma))
         }
+        return out
     }
 
     /// Constant jerk from rest: `a = a₀ + j·t`, `v = a₀t + ½jt²`, `s = ½a₀t² + ⅙jt³`.
     static func constantJerk(
         a0: Double, jerk j: Double, duration: Double, dt: Double = 0.01
     ) -> [SmoothedSample] {
-        stride(from: 0.0, through: duration, by: dt).map { t in
-            sample(
-                t: t,
-                s: 0.5 * a0 * t * t + j * t * t * t / 6,
-                v: a0 * t + 0.5 * j * t * t,
-                a: a0 + j * t
-            )
+        var out: [SmoothedSample] = []
+        for t in stride(from: 0.0, through: duration, by: dt) {
+            let t2: Double = t * t
+            let t3: Double = t2 * t
+            let distance: Double = 0.5 * a0 * t2 + j * t3 / 6
+            let speed: Double = a0 * t + 0.5 * j * t2
+            let acceleration: Double = a0 + j * t
+            out.append(sample(t: t, s: distance, v: speed, a: acceleration))
         }
+        return out
     }
 
     static func sample(
