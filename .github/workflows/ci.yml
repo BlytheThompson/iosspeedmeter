@@ -85,6 +85,29 @@ jobs:
       # An .ipa is a zip with the .app inside a Payload/ directory. Building the archive by
       # hand rather than via `xcodebuild -exportArchive` avoids needing a provisioning profile,
       # which is the whole point of the unsigned path.
+      # XcodeGen once generated an Info.plist over the top of the real one, silently dropping
+      # every usage description. Spec §11: the app CRASHES without the location and motion
+      # ones, and cannot export logs without the file-sharing pair. Assert them.
+      - name: Verify the built Info.plist carries the §11 keys
+        run: |
+          APP_PATH="$(find build/Build/Products/Release-iphoneos -maxdepth 1 -name '*.app' | head -1)"
+          PLIST="$APP_PATH/Info.plist"
+          fail=0
+          for key in NSLocationWhenInUseUsageDescription NSMotionUsageDescription                      NSLocalNetworkUsageDescription NSBluetoothAlwaysUsageDescription                      UIFileSharingEnabled LSSupportsOpeningDocumentsInPlace; do
+            if /usr/libexec/PlistBuddy -c "Print :$key" "$PLIST" >/dev/null 2>&1; then
+              echo "ok   $key"
+            else
+              echo "::error::missing Info.plist key required by spec §11: $key"
+              fail=1
+            fi
+          done
+          ARCHS="$(/usr/libexec/PlistBuddy -c 'Print :UIRequiredDeviceCapabilities' "$PLIST")"
+          case "$ARCHS" in
+            *armv7*) echo "::error::UIRequiredDeviceCapabilities declares armv7; iOS will refuse the install"; fail=1 ;;
+            *) echo "ok   UIRequiredDeviceCapabilities" ;;
+          esac
+          exit $fail
+
       - name: Package the .ipa
         run: |
           APP_PATH="$(find build/Build/Products/Release-iphoneos -maxdepth 1 -name '*.app' | head -1)"

@@ -41,11 +41,11 @@ targets:
       - path: App
         excludes:
           - "**/.DS_Store"
+          # Consumed via INFOPLIST_FILE below, not copied in as a resource.
+          - "Info.plist"
     dependencies:
       - package: PerformanceTimer
         product: PerformanceTimerCore
-    info:
-      path: App/Info.plist
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.performancetimer.app
