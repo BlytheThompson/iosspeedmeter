@@ -68,9 +68,11 @@
         <key>UIColorName</key>
         <string></string>
     </dict>
+    <!-- arm64, not armv7. Declaring armv7 on an arm64-only binary makes iOS refuse the
+         install as incompatible — a copy-paste survivor from the 32-bit era. -->
     <key>UIRequiredDeviceCapabilities</key>
     <array>
-        <string>armv7</string>
+        <string>arm64</string>
         <string>gyroscope</string>
         <string>accelerometer</string>
         <string>location-services</string>
