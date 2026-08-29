@@ -184,12 +184,21 @@ public final class SessionController: ObservableObject {
         Task.detached(priority: .userInitiated) {
             let result = processor.analyse()
             let rows = SessionLogBuilder.rows(analysis: result, events: events)
-            // Spec §10: log every session, always, regardless of outcome.
-            try? store.write(header: header, rows: rows)
+
+            // Spec §10: log every session, always, regardless of outcome. A failure here must
+            // be visible — a silently missing log is exactly the run you would later want to
+            // read, and swallowing the error would make the app quietly lossy.
+            var writeError: String?
+            do {
+                _ = try store.write(header: header, rows: rows)
+            } catch {
+                writeError = "Could not save the session log: \(error.localizedDescription)"
+            }
 
             await MainActor.run {
                 self.analysis = result
                 self.isAnalysing = false
+                if let writeError { self.lastError = writeError }
                 estimator.finishAnalysis()
                 self.readout = estimator.readout
                 self.refreshSessions()

@@ -31,7 +31,7 @@ jobs:
     runs-on: ubuntu-latest
     container: swift:6.0
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Build
         run: swift build --build-tests
@@ -57,7 +57,7 @@ jobs:
     runs-on: macos-15
     if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/')
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Select Xcode
         run: sudo xcode-select -s /Applications/Xcode.app
@@ -97,7 +97,7 @@ jobs:
           zip -qry PerformanceTimer-unsigned.ipa Payload
           ls -lh PerformanceTimer-unsigned.ipa
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: PerformanceTimer-unsigned-ipa
           path: PerformanceTimer-unsigned.ipa
