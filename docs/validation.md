@@ -15,7 +15,8 @@ four of the five tests below need a car and none of them have been run.
 | §12.4 Consistency | That the claimed uncertainty is honest | **Not run** on real data; a synthetic analogue passes |
 | §12.5 Reciprocal | Grade handling | **Not run** |
 
-Everything automated runs on every push. Nothing automated can validate a sensor.
+Everything automated runs on every push, including a macOS job that compiles the iOS layer and
+produces an unsigned `.ipa`. Nothing automated can validate a sensor.
 
 ## What the automated tests actually cover
 

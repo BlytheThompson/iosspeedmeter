@@ -188,9 +188,12 @@ public final class SessionController: ObservableObject {
             // Spec §10: log every session, always, regardless of outcome. A failure here must
             // be visible — a silently missing log is exactly the run you would later want to
             // read, and swallowing the error would make the app quietly lossy.
-            var writeError: String?
+            // `let` assigned on both branches rather than a mutable var: capturing a var
+            // across the actor hop below is an error in the Swift 6 language mode.
+            let writeError: String?
             do {
                 _ = try store.write(header: header, rows: rows)
+                writeError = nil
             } catch {
                 writeError = "Could not save the session log: \(error.localizedDescription)"
             }

@@ -65,11 +65,20 @@ See [docs/building.md](docs/building.md). In short: push, and the GitHub Actions
 produces an unsigned `.ipa` as a build artifact; install it with Sideloadly, AltStore or
 SideStore.
 
+## Build status
+
+Both CI jobs pass on every push to `main`:
+
+- **Core tests (Linux)** — 246 tests over `PerformanceTimerCore`, plus a gate that fails the
+  build if an Apple-framework import ever reaches the core, and a replay-harness smoke test.
+- **Unsigned .ipa (macOS)** — XcodeGen + `xcodebuild` for device. The iOS layer compiles clean,
+  and the `.ipa` is downloadable from the run's artifacts.
+
 ## Before you trust a number
 
 See [docs/validation.md](docs/validation.md). The synthetic end-to-end test agrees with exact
-ground truth to about 15 ms, but that only validates the maths between the sensors and the
-timeslip. Spec §12.3's video ground truth is the only test that validates the whole chain, and
+ground truth to about 15 ms, and CI compiles the iOS layer — but neither validates a sensor.
+Both only cover the maths between the sensors and the timeslip. Spec §12.3's video ground truth is the only test that validates the whole chain, and
 it has not been run — the app should not be trusted until it has.
 
 ## Deviations from the spec
