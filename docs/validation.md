@@ -20,7 +20,7 @@ produces an unsigned `.ipa`. Nothing automated can validate a sensor.
 
 ## What the automated tests actually cover
 
-242 tests over `PerformanceTimerCore`. The ones that carry the most weight:
+246 tests over `PerformanceTimerCore`. The ones that carry the most weight:
 
 **§12.1 bench test** (`testBenchTestSixtySecondsStationary`). Sixty seconds of synthetic
 stationary data at 100 Hz with a realistic 0.08 m/s² turn-on bias. The smoothed speed must stay

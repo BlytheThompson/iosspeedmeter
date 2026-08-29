@@ -24,7 +24,7 @@ device, and CI enforces the purity on every push.
 Sources/PerformanceTimerCore/    Pure Swift. All the maths. No Apple frameworks.
 Sources/PerformanceTimerReplay/  pt-replay — the offline replay and tuning harness.
 App/                             iOS only: sensor adapters and SwiftUI.
-Tests/                           242 tests over the core.
+Tests/                           246 tests over the core.
 docs/                            Build and validation guides, plus the implementation plan.
 ```
 
