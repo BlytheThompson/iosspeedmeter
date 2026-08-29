@@ -1,0 +1,280 @@
+<title>Asphalt and Paper</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+
+<style>
+  /* ---- tokens: complete light palette on bare :root ---- */
+  :root{
+    --ground:#EDEAE4;
+    --surface:#FFFFFF;
+    --line:#D6D2CA;
+    --text:#191C1E;
+    --muted:#5E666B;
+    --faint:#8A9398;
+    --amber:#B37200;
+    --green:#137A4C;
+    --red:#B3282D;
+    --rule:#C9C4BB;
+
+    /* the app's own palette — fixed, because these depict a fixed-appearance app */
+    --asphalt:#0E1113; --graphite:#2A3034; --paper:#F2EFE9; --ink:#16191B;
+    --a-amber:#FFB020; --a-green:#35D07F; --a-red:#E5484D; --a-dim:#8A9398;
+
+    --display:'Archivo',system-ui,sans-serif;
+    --body:'IBM Plex Sans',system-ui,sans-serif;
+    --mono:'IBM Plex Mono',ui-monospace,monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#15181B; --surface:#1C2126; --line:#2C3237;
+      --text:#E6EAEC; --muted:#9AA3A9; --faint:#767F85;
+      --amber:#FFB020; --green:#35D07F; --red:#E5484D; --rule:#2C3237;
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#15181B; --surface:#1C2126; --line:#2C3237;
+    --text:#E6EAEC; --muted:#9AA3A9; --faint:#767F85;
+    --amber:#FFB020; --green:#35D07F; --red:#E5484D; --rule:#2C3237;
+  }
+
+  *{box-sizing:border-box}
+  body{
+    margin:0;background:var(--ground);color:var(--text);
+    font-family:var(--body);font-size:16px;line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1080px;margin:0 auto;padding:56px 24px 96px;display:flex;flex-direction:column;gap:56px}
+  h1{font-family:var(--display);font-weight:800;font-size:clamp(30px,5vw,44px);line-height:1.05;letter-spacing:-.02em;margin:0;text-wrap:balance}
+  h2{font-family:var(--display);font-weight:700;font-size:22px;letter-spacing:-.01em;margin:0 0 4px;text-wrap:balance}
+  p{margin:0;max-width:66ch}
+  .lede{color:var(--muted);font-size:18px;max-width:62ch}
+  .eyebrow{font-family:var(--display);font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--faint)}
+  section{display:flex;flex-direction:column;gap:20px}
+  .stack{display:flex;flex-direction:column;gap:10px}
+
+  /* ---- device display ---- */
+  .screens{display:flex;gap:40px;flex-wrap:wrap;align-items:flex-start}
+  .unit{display:flex;flex-direction:column;gap:12px}
+  .frame{
+    width:393px;height:852px;border-radius:34px;overflow:hidden;
+    transform:scale(.58);transform-origin:top left;
+    box-shadow:0 18px 50px rgba(0,0,0,.34);
+  }
+  .slot{width:228px;height:494px}      /* 393*.58, 852*.58 */
+  .meta{font-family:var(--mono);font-size:12px;color:var(--muted)}
+  .meta b{font-family:var(--display);font-weight:700;color:var(--text);letter-spacing:.04em;text-transform:uppercase;font-size:11px}
+
+  /* ---- app: shared ---- */
+  .mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+  .lbl{text-transform:uppercase;letter-spacing:1.4px;color:var(--a-dim);font-weight:600;font-family:var(--body)}
+
+  /* ---- app: live ---- */
+  .live{background:var(--asphalt);color:var(--paper);padding:0 20px;display:flex;flex-direction:column;height:100%;font-family:var(--body)}
+  .status{display:flex;justify-content:space-between;align-items:flex-start;padding-top:14px}
+  .stitle{font-family:var(--display);font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:1.8px;color:var(--a-amber)}
+  .tree{background:rgba(0,0,0,.35);border:1px solid var(--graphite);border-radius:6px;padding:14px 12px;display:flex;flex-direction:column;gap:10px}
+  .bulb{width:18px;height:18px;border-radius:50%;background:var(--graphite);border:1px solid rgba(0,0,0,.4)}
+  .bulb.on{background:var(--a-amber);box-shadow:0 0 8px rgba(255,176,32,.7)}
+  .bulb.g{margin-top:4px}
+  .bulb.g.on{background:var(--a-green);box-shadow:0 0 8px rgba(53,208,127,.7)}
+  .flex{flex:1}
+  .speed{text-align:center;padding-bottom:70px}
+  .speedn{font-size:148px;font-weight:600;line-height:1;letter-spacing:-.03em}
+  .speedu{font-size:13px;margin-top:-6px}
+  .peak{margin-top:14px;color:var(--a-dim);display:flex;gap:6px;justify-content:center;align-items:baseline}
+  .bar{height:4px;background:var(--graphite)}
+  .barfill{height:4px;background:var(--a-green)}
+  .drow{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+  .telem{display:flex;gap:18px;padding:14px 0;border-top:1px solid var(--graphite);margin-top:18px}
+  .tcell{flex:1}
+  .tname{font-size:9px;text-transform:uppercase;letter-spacing:1.4px;color:var(--a-dim);font-weight:600}
+  .tval{font-size:13px;margin-top:3px}
+  .btn{padding:15px 0;border-radius:4px;text-align:center;font-family:var(--display);font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1.4px;color:var(--paper);margin-bottom:22px;background:var(--a-red)}
+
+  /* ---- app: timeslip ---- */
+  .slip{background:var(--paper);color:var(--ink);padding:22px;height:100%;overflow:hidden;font-family:var(--body)}
+  .mast{font-family:var(--display);font-size:26px;font-weight:800;text-transform:uppercase;letter-spacing:4px}
+  .chip{display:inline-block;font-size:10px;text-transform:uppercase;letter-spacing:1.4px;padding:3px 7px;font-weight:600;background:rgba(53,208,127,.28);margin-top:6px}
+  .sech{font-size:10px;text-transform:uppercase;letter-spacing:1.4px;color:rgba(22,25,27,.5);font-weight:600;margin:20px 0 8px}
+  .r{display:flex;justify-content:space-between;align-items:baseline;padding:6px 0}
+  .rn{font-size:14px;font-weight:600}
+  .v{display:flex;align-items:baseline;gap:6px}
+  .v1{font-size:24px;font-weight:600}
+  .v2{font-size:15px;font-weight:500;color:rgba(22,25,27,.65)}
+  .v3{font-size:11px;text-transform:uppercase;letter-spacing:1.4px;color:rgba(22,25,27,.5);font-weight:600}
+  .hr{border-bottom:1px solid rgba(22,25,27,.12)}
+  .d2{padding:7px 0}
+  .dsub{text-align:right;font-size:11px;color:rgba(22,25,27,.55);margin-top:2px}
+  .note{font-size:11px;color:rgba(22,25,27,.55);margin-bottom:6px}
+
+  /* ---- findings: dimensioned like a drawing, because they came from measurement ---- */
+  .find{display:grid;grid-template-columns:auto 1fr;gap:0 20px;align-items:start}
+  .dim{
+    font-family:var(--mono);font-size:12px;font-weight:600;color:var(--red);
+    border-left:2px solid var(--red);padding-left:12px;white-space:nowrap;
+  }
+  .dim.fixed{color:var(--green);border-color:var(--green)}
+  .findings{display:flex;flex-direction:column;gap:28px}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:22px 24px;display:flex;flex-direction:column;gap:14px}
+  .nums{display:flex;gap:28px;flex-wrap:wrap;font-family:var(--mono);font-size:13px}
+  .num b{display:block;font-size:11px;font-family:var(--display);letter-spacing:.1em;text-transform:uppercase;color:var(--faint);font-weight:700;margin-bottom:2px}
+  .was{color:var(--red)}
+  .now{color:var(--green)}
+  ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px;max-width:66ch;color:var(--muted)}
+  li b{color:var(--text);font-weight:600}
+  a{color:inherit;text-decoration-thickness:1px;text-underline-offset:3px}
+  a:focus-visible{outline:2px solid var(--amber);outline-offset:3px;border-radius:2px}
+  footer{border-top:1px solid var(--rule);padding-top:20px;color:var(--faint);font-size:14px}
+  @media (max-width:760px){ .frame{transform:scale(.46);} .slot{width:181px;height:392px} }
+</style>
+
+<div class="wrap">
+
+  <header class="stack">
+    <div class="eyebrow">GNSS/IMU performance timer · screen layout</div>
+    <h1>Asphalt and Paper</h1>
+    <p class="lede">Two surfaces, deliberately inverted. The live screen is read through a
+      windscreen with the phone mounted; the result is a printed receipt. Both are shown here at
+      true device proportions so the layout can be judged without installing anything.</p>
+  </header>
+
+  <section>
+    <div class="screens">
+
+      <div class="unit">
+        <div class="slot"><div class="frame"><div class="live">
+          <div class="status">
+            <div>
+              <div class="stitle">Armed</div>
+              <div class="lbl" style="font-size:11px;margin-top:6px">Waiting for still</div>
+            </div>
+            <div class="tree">
+              <div class="bulb on"></div><div class="bulb on"></div>
+              <div class="bulb"></div><div class="bulb g"></div>
+            </div>
+          </div>
+          <div class="flex"></div>
+          <div class="speed">
+            <div class="speedn mono">87.4</div>
+            <div class="speedu lbl">mph</div>
+            <div class="peak"><span class="lbl" style="font-size:9px">Peak</span><span class="mono" style="font-size:15px">92.6</span></div>
+          </div>
+          <div class="flex"></div>
+          <div>
+            <div class="bar"><div class="barfill" style="width:35%"></div></div>
+            <div class="drow">
+              <span class="mono" style="font-size:13px">142 m</span>
+              <span class="lbl" style="font-size:11px">402 m target</span>
+            </div>
+          </div>
+          <div class="telem">
+            <div class="tcell"><div class="tname">GNSS</div><div class="tval mono" style="color:var(--a-green)">lock</div></div>
+            <div class="tcell"><div class="tname">ZUPT</div><div class="tval mono" style="color:var(--a-dim)">off</div></div>
+            <div class="tcell"><div class="tname">Bias</div><div class="tval mono">+0.124</div></div>
+            <div class="tcell"><div class="tname">Accel</div><div class="tval mono">+4.96</div></div>
+          </div>
+          <div class="btn">Stop run</div>
+        </div></div></div>
+        <div class="meta"><b>Asphalt</b> — live · 393 × 852 pt at 58%</div>
+      </div>
+
+      <div class="unit">
+        <div class="slot"><div class="frame"><div class="slip">
+          <div class="mast">Timeslip</div>
+          <div><span class="chip">High confidence</span></div>
+
+          <div class="sech">From a standstill</div>
+          <div class="r"><span class="rn">0–30 mph</span><span class="v"><span class="v1 mono">2.700</span><span class="v2 mono">± 0.007</span><span class="v3">s</span></span></div><div class="hr"></div>
+          <div class="r"><span class="rn">0–60 mph</span><span class="v"><span class="v1 mono">5.385</span><span class="v2 mono">± 0.007</span><span class="v3">s</span></span></div><div class="hr"></div>
+          <div class="r"><span class="rn">0–100 mph</span><span class="v"><span class="v1 mono">8.963</span><span class="v2 mono">± 0.007</span><span class="v3">s</span></span></div><div class="hr"></div>
+
+          <div class="sech">Distance marks</div>
+          <div class="note">The large figure is the 1-foot rollout ET — what a drag strip prints and what Dragy shows.</div>
+          <div class="d2">
+            <div class="r" style="padding:0"><span class="rn">60 ft</span><span class="v"><span class="v1 mono">2.353</span><span class="v2 mono">± 0.004</span><span class="v3">s</span></span></div>
+            <div class="dsub">from rest <span class="mono">2.721</span> s · trap <span class="mono">30.2</span> mph</div>
+          </div><div class="hr"></div>
+          <div class="d2">
+            <div class="r" style="padding:0"><span class="rn">1/8 mile</span><span class="v"><span class="v1 mono">8.621</span><span class="v2 mono">± 0.003</span><span class="v3">s</span></span></div>
+            <div class="dsub">from rest <span class="mono">8.989</span> s · trap <span class="mono">100.3</span> mph</div>
+          </div><div class="hr"></div>
+          <div class="d2">
+            <div class="r" style="padding:0"><span class="rn">1/4 mile</span><span class="v"><span class="v1 mono">12.336</span><span class="v2 mono">± 0.003</span><span class="v3">s</span></span></div>
+            <div class="dsub">from rest <span class="mono">12.705</span> s · trap <span class="mono">141.9</span> mph</div>
+          </div><div class="hr"></div>
+        </div></div></div>
+        <div class="meta"><b>Paper</b> — result · 393 × 852 pt at 58%</div>
+      </div>
+
+    </div>
+  </section>
+
+  <section>
+    <div class="stack">
+      <div class="eyebrow">Measured, not eyeballed</div>
+      <h2>Two faults the ruler found</h2>
+      <p class="lede">Neither screen could be seen without a Mac, so both were rebuilt in the
+        browser at 1&nbsp;pt&nbsp;=&nbsp;1&nbsp;px and measured in the DOM. Two problems came out
+        that reading the code had not surfaced.</p>
+    </div>
+
+    <div class="findings">
+      <div class="card">
+        <h2>Half the live screen was empty</h2>
+        <div class="nums">
+          <div class="num"><b>Gap above speed</b><span class="was">213.5 pt</span> → <span class="now">129 pt</span></div>
+          <div class="num"><b>Gap below speed</b><span class="was">213.5 pt</span> → <span class="now">208 pt</span></div>
+          <div class="num"><b>Readout size</b><span class="was">92 pt</span> → <span class="now">148 pt</span></div>
+        </div>
+        <p>Two equal spacers put 427&nbsp;pt of dead space around a 92&nbsp;pt number on an
+          852&nbsp;pt screen — the readout floated, unanchored, earning none of its clearance.
+          It is now large enough to occupy the space and sits above the optical centre, with
+          peak speed beneath it and the lower half given to progress and telemetry.</p>
+      </div>
+
+      <div class="card">
+        <h2>The distance marks had no uncertainty</h2>
+        <div class="nums">
+          <div class="num"><b>Name column</b><span class="was">83 pt</span> → <span class="now">flexible</span></div>
+          <div class="num"><b>Fixed columns</b><span class="was">266 pt</span> → <span class="now">0 pt</span></div>
+          <div class="num"><b>± shown</b><span class="was">no</span> → <span class="now">yes</span></div>
+        </div>
+        <p>As a four-column table the marks fit a 393&nbsp;pt phone only by squeezing the name
+          column to 83&nbsp;pt and dropping the ± entirely — the one figure the spec insists must
+          never be dropped, on the row a drag racer actually cares about. Each mark is now two
+          lines: the rollout ET with its uncertainty promoted, from-rest and trap demoted
+          beneath. Nothing was lost, and it reads at a glance instead of by column scan.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="stack">
+      <div class="eyebrow">Rules the screens follow</div>
+      <h2>Why it looks like this</h2>
+    </div>
+    <ul>
+      <li><b>The staging tree is structural, not ornamental.</b> Each bulb is one of the three
+        conditions the app requires before it will arm — satellite lock, solved vehicle frame,
+        detected stillness. The unlit bulb answers <i>why won't it arm</i>, which is the only
+        question anyone asks in a car park. The green bulb is the launch.</li>
+      <li><b>The ± is set co-equal with the number.</b> A 0–60 of 4.31&nbsp;±&nbsp;0.04&nbsp;s is
+        an honest number; 4.31&nbsp;s alone is not. Rendering the uncertainty small and grey
+        would quietly undo the entire reason the app post-processes at all.</li>
+      <li><b>Digits are monospaced everywhere.</b> A timeslip is machine-printed, and a
+        proportional digit set makes a speed readout jitter sideways as it counts.</li>
+      <li><b>The live screen shows no elapsed time.</b> Results come only from the backward
+        smoothing pass after the run ends, so a running clock would invite trust in a number
+        that is not the answer. The time appears once, on the timeslip.</li>
+      <li><b>Amber, green and red mean what they mean on a strip.</b> They are staging-tree
+        vocabulary, used only for the states those lights stand for — never as decoration.</li>
+    </ul>
+  </section>
+
+  <footer>
+    Screens depict a fixed-appearance app and do not follow this page's light or dark theme.
+    Numbers are from a synthetic run with a known answer, not a measured car.
+  </footer>
+
+</div>

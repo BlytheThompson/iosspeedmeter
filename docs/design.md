@@ -37,7 +37,7 @@ timeslip, after the smoother has run.
 
 ## Two layout faults found by measurement
 
-`docs/layout-check.html` re-creates both screens at 1 pt = 1 px so the layout can be measured
+`docs/design-reference.html` shows both screens as built; `docs/layout-check.html` re-creates both screens at 1 pt = 1 px so the layout can be measured
 without a device. Open it in any browser. Two faults came out of it:
 
 **427 pt of dead space.** Two equal `Spacer()`s put 213 pt above and below the speed readout —
