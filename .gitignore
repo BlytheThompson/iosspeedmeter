@@ -1,0 +1,14 @@
+# Build products
+.build/
+build/
+DerivedData/
+*.xcodeproj
+*.xcworkspace
+Payload/
+*.ipa
+
+# Session logs are data, not source
+*.csv
+!Tests/**/*.csv
+
+.DS_Store

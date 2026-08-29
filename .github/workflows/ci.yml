@@ -1,0 +1,104 @@
+# Spec §14 — building and sideloading without a Mac.
+#
+# Two jobs, deliberately separated:
+#
+#   core   runs on Linux. PerformanceTimerCore imports nothing from Apple (spec Decision 2), so
+#          the entire estimator — Kalman filter, RTS smoother, UBX parser, crossing solver — is
+#          tested on a free, fast runner on every push. This is the gate that matters, because
+#          it is where all the maths lives.
+#
+#   ipa    runs on macOS and produces the unsigned .ipa that Sideloadly / AltStore / SideStore
+#          install. macOS runner minutes bill at a 10× multiplier on private repositories, so
+#          it deliberately runs only on the default branch, tags, and manual dispatch — not on
+#          every pull-request push.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  core:
+    name: Core tests (Linux)
+    runs-on: ubuntu-latest
+    container: swift:5.10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build
+        run: swift build --build-tests
+
+      - name: Test
+        run: swift test --parallel
+
+      # Spec Decision 2 in enforceable form. If an Apple framework import ever reaches the
+      # core, the off-device test suite silently stops covering it — so fail loudly instead.
+      - name: Assert the core imports no Apple frameworks
+        run: |
+          if grep -rnE '^\s*import (CoreMotion|CoreLocation|Network|CoreBluetooth|UIKit|SwiftUI|QuartzCore)' Sources/PerformanceTimerCore; then
+            echo "::error::PerformanceTimerCore must stay free of Apple-framework imports (spec Decision 2)"
+            exit 1
+          fi
+          echo "Core is framework-free."
+
+      - name: Replay harness smoke test
+        run: swift run pt-replay --synthetic --quiet
+
+  ipa:
+    name: Unsigned .ipa (macOS)
+    runs-on: macos-15
+    if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/')
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode.app
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate the project
+        run: xcodegen generate
+
+      - name: Build for device, unsigned
+        run: |
+          set -o pipefail
+          xcodebuild \
+            -project PerformanceTimer.xcodeproj \
+            -scheme PerformanceTimer \
+            -configuration Release \
+            -sdk iphoneos \
+            -derivedDataPath build \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+
+      # An .ipa is a zip with the .app inside a Payload/ directory. Building the archive by
+      # hand rather than via `xcodebuild -exportArchive` avoids needing a provisioning profile,
+      # which is the whole point of the unsigned path.
+      - name: Package the .ipa
+        run: |
+          APP_PATH="$(find build/Build/Products/Release-iphoneos -maxdepth 1 -name '*.app' | head -1)"
+          if [ -z "$APP_PATH" ]; then
+            echo "::error::No .app was produced"
+            exit 1
+          fi
+          mkdir -p Payload
+          cp -R "$APP_PATH" Payload/
+          zip -qry PerformanceTimer-unsigned.ipa Payload
+          ls -lh PerformanceTimer-unsigned.ipa
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: PerformanceTimer-unsigned-ipa
+          path: PerformanceTimer-unsigned.ipa
+          retention-days: 30

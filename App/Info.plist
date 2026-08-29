@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Spec §11 — Info.plist and entitlements.
+
+  Every key below is required by a specific part of the design; the comments say which, because
+  three of them cause a silent failure rather than an obvious one:
+
+  - NSLocationWhenInUseUsageDescription / NSMotionUsageDescription: the app CRASHES on first use
+    without these, not merely degrades.
+  - NSLocalNetworkUsageDescription: without it, the Wi-Fi socket to an external receiver fails
+    SILENTLY on iOS 14+.
+
+  UIBackgroundModes -> location is deliberately absent. Spec §11: it "adds review friction and
+  isn't needed for a screen-on timer", and the app disables the idle timer while armed instead.
+-->
+<plist version="1.0">
+<dict>
+    <key>CFBundleDevelopmentRegion</key>
+    <string>en</string>
+    <key>CFBundleDisplayName</key>
+    <string>Performance Timer</string>
+    <key>CFBundleExecutable</key>
+    <string>$(EXECUTABLE_NAME)</string>
+    <key>CFBundleIdentifier</key>
+    <string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+    <key>CFBundleInfoDictionaryVersion</key>
+    <string>6.0</string>
+    <key>CFBundleName</key>
+    <string>$(PRODUCT_NAME)</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleShortVersionString</key>
+    <string>1.0</string>
+    <key>CFBundleVersion</key>
+    <string>1</string>
+
+    <!-- Required. The app crashes without it (spec §11). -->
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>Performance Timer uses GNSS speed to correct the inertial estimate of your run. Location is used only while the app is open and never leaves your device.</string>
+
+    <!-- Required for CoreMotion. The app crashes without it (spec §11). -->
+    <key>NSMotionUsageDescription</key>
+    <string>Performance Timer reads the accelerometer and gyroscope at 100 Hz to measure acceleration between GNSS fixes.</string>
+
+    <!-- Required for the Wi-Fi socket to an external receiver. Without it the connection
+         fails silently on iOS 14+ (spec §3.5, §11). -->
+    <key>NSLocalNetworkUsageDescription</key>
+    <string>Performance Timer connects to an external GNSS receiver on your local Wi-Fi network to record 25 Hz position fixes.</string>
+
+    <!-- Only needed for the BLE receiver path (spec §3.6). -->
+    <key>NSBluetoothAlwaysUsageDescription</key>
+    <string>Performance Timer connects to a Bluetooth GNSS receiver to record higher-rate position fixes.</string>
+
+    <!-- Only needed if the receiver is discovered via Bonjour (spec §3.5). -->
+    <key>NSBonjourServices</key>
+    <array>
+        <string>_gpsd._tcp</string>
+    </array>
+
+    <!-- Spec §10/§11: pull session logs off through the Files app, with no computer. -->
+    <key>UIFileSharingEnabled</key>
+    <true/>
+    <key>LSSupportsOpeningDocumentsInPlace</key>
+    <true/>
+
+    <key>UILaunchScreen</key>
+    <dict>
+        <key>UIColorName</key>
+        <string></string>
+    </dict>
+    <key>UIRequiredDeviceCapabilities</key>
+    <array>
+        <string>armv7</string>
+        <string>gyroscope</string>
+        <string>accelerometer</string>
+        <string>location-services</string>
+        <string>gps</string>
+    </array>
+    <key>UISupportedInterfaceOrientations</key>
+    <array>
+        <string>UIInterfaceOrientationPortrait</string>
+        <string>UIInterfaceOrientationLandscapeLeft</string>
+        <string>UIInterfaceOrientationLandscapeRight</string>
+    </array>
+    <key>UIUserInterfaceStyle</key>
+    <string>Dark</string>
+</dict>
+</plist>

@@ -1,0 +1,72 @@
+# XcodeGen project definition.
+#
+# The .xcodeproj is generated rather than committed, because spec §14's build path is "push
+# code from any machine, let CI produce the .ipa, download it" — and a generated project keeps
+# that reproducible without ever opening Xcode. Run `xcodegen generate` on any Mac, or let the
+# GitHub Actions workflow do it.
+#
+# Note the target split: PerformanceTimerCore comes in as a local Swift package, so the
+# numerical core stays free of Apple-framework imports and keeps building and testing on
+# Linux/Windows CI as well (spec Decision 2).
+
+name: PerformanceTimer
+options:
+  bundleIdPrefix: com.performancetimer
+  deploymentTarget:
+    iOS: "17.0"
+  createIntermediateGroups: true
+  generateEmptyDirectories: false
+  xcodeVersion: "1600"
+
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    ENABLE_USER_SCRIPT_SANDBOXING: YES
+    SWIFT_STRICT_CONCURRENCY: minimal
+    # Warnings are cheap here and the maths is the product; keep them visible.
+    GCC_TREAT_WARNINGS_AS_ERRORS: NO
+    CLANG_ANALYZER_NONNULL: YES
+
+packages:
+  # The key must match the `name:` in Package.swift ("PerformanceTimer"), not the product
+  # name — Xcode resolves the local package by that name and fails silently otherwise.
+  PerformanceTimer:
+    path: .
+
+targets:
+  PerformanceTimer:
+    type: application
+    platform: iOS
+    sources:
+      - path: App
+        excludes:
+          - "**/.DS_Store"
+    dependencies:
+      - package: PerformanceTimer
+        product: PerformanceTimerCore
+    info:
+      path: App/Info.plist
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.performancetimer.app
+        PRODUCT_NAME: Performance Timer
+        INFOPLIST_FILE: App/Info.plist
+        TARGETED_DEVICE_FAMILY: "1,2"
+        # Spec §14: CI builds an UNSIGNED .ipa, which is then sideloaded with Sideloadly,
+        # AltStore or SideStore. Signing happens on the sideloading tool's side.
+        CODE_SIGNING_REQUIRED: NO
+        CODE_SIGNING_ALLOWED: NO
+        CODE_SIGN_IDENTITY: ""
+        CODE_SIGN_STYLE: Manual
+        DEVELOPMENT_TEAM: ""
+        SUPPORTS_MACCATALYST: NO
+
+schemes:
+  PerformanceTimer:
+    build:
+      targets:
+        PerformanceTimer: all
+    run:
+      config: Debug
+    archive:
+      config: Release
